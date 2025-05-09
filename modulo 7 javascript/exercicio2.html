@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<head>
+    <title>Lista de Tarefas com localStorage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 600px;
+            margin: auto;
+        }
+        input[type="text"] {
+            width: 60%;
+            padding: 8px;
+            font-size: 1em;
+        }
+        button {
+            padding: 8px 12px;
+            font-size: 1em;
+            margin-left: 10px;
+        }
+        .tarefa {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 8px 0;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        .descricao {
+            display: flex;
+            align-items: center;
+            flex-grow: 1;
+        }
+        .descricao span {
+            margin-left: 10px;
+        }
+        .concluida {
+            text-decoration: line-through;
+            color: gray;
+            font-style: italic;
+        }
+        .nao-concluida {
+            font-weight: bold;
+            color: #333;
+        }
+        .remover-btn {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+        .remover-btn:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Lista de Tarefas</h1>
+
+    <input type="text" id="descricao" placeholder="Digite a descrição da tarefa">
+    <button onclick="adicionarTarefa()">Adicionar</button>
+
+    <div id="lista-tarefas"></div>
+
+    <script>
+        let tarefas = [];
+
+        window.onload = function () {
+            const armazenadas = localStorage.getItem('tarefas');
+            if (armazenadas) {
+                tarefas = JSON.parse(armazenadas);
+            }
+            atualizarLista();
+        }
+
+        function salvarNoLocalStorage() {
+            localStorage.setItem('tarefas', JSON.stringify(tarefas));
+        }
+
+        function adicionarTarefa() {
+            const input = document.getElementById('descricao');
+            const descricao = input.value.trim();
+
+            if (descricao === "") return;
+
+            tarefas.push({
+                descricao: descricao,
+                status: false
+            });
+
+            salvarNoLocalStorage();
+            input.value = "";
+            atualizarLista();
+        }
+
+        function excluirTarefa(index) {
+            tarefas.splice(index, 1);
+            salvarNoLocalStorage();
+            atualizarLista();
+        }
+
+        function atualizarLista() {
+            const listaDiv = document.getElementById('lista-tarefas');
+            listaDiv.innerHTML = "";
+
+            tarefas.forEach((tarefa, index) => {
+                const divTarefa = document.createElement('div');
+                divTarefa.className = 'tarefa';
+
+                const divDescricao = document.createElement('div');
+                divDescricao.className = 'descricao';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.checked = tarefa.status;
+                checkbox.addEventListener('change', () => {
+                    tarefa.status = checkbox.checked;
+                    salvarNoLocalStorage();
+                    atualizarLista();
+                });
+
+                const span = document.createElement('span');
+                span.textContent = tarefa.descricao;
+                span.className = tarefa.status ? 'concluida' : 'nao-concluida';
+
+                divDescricao.appendChild(checkbox);
+                divDescricao.appendChild(span);
+
+                const botaoRemover = document.createElement('button');
+                botaoRemover.textContent = "Excluir";
+                botaoRemover.className = "remover-btn";
+                botaoRemover.onclick = () => excluirTarefa(index);
+
+                divTarefa.appendChild(divDescricao);
+                divTarefa.appendChild(botaoRemover);
+
+                listaDiv.appendChild(divTarefa);
+            });
+        }
+    </script>
+
+</body>
+</html>

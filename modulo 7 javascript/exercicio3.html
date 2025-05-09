@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<head>
+  <title>Buscar Usuários do GitHub</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px;
+      max-width: 600px;
+      margin: auto;
+    }
+    input[type="text"] {
+      width: 70%;
+      padding: 8px;
+      font-size: 1em;
+    }
+    button {
+      padding: 8px 12px;
+      font-size: 1em;
+      margin-left: 10px;
+    }
+    .usuario {
+      display: flex;
+      align-items: center;
+      margin-top: 15px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+    }
+    .usuario img {
+      width: 50px;
+      height: 50px;
+      border-radius: 50%;
+    }
+    .usuario a {
+      margin-left: 15px;
+      text-decoration: none;
+      color: #0366d6;
+      font-weight: bold;
+    }
+    #mensagem {
+      margin-top: 20px;
+      font-weight: bold;
+      color: red;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>Buscar Usuários do GitHub</h1>
+
+  <input type="text" id="busca" placeholder="Digite um nome de usuário">
+  <button onclick="buscarUsuarios()">Buscar</button>
+
+  <div id="resultados"></div>
+  <div id="mensagem"></div>
+
+  <script>
+    async function buscarUsuarios() {
+      const termo = document.getElementById('busca').value.trim();
+      const resultadosDiv = document.getElementById('resultados');
+      const mensagemDiv = document.getElementById('mensagem');
+
+      resultadosDiv.innerHTML = "";
+      mensagemDiv.textContent = "";
+
+      if (termo === "") {
+        mensagemDiv.textContent = "Digite um nome para buscar.";
+        return;
+      }
+
+      try {
+        const resposta = await fetch(`https://api.github.com/search/users?q=${encodeURIComponent(termo)}`);
+        const dados = await resposta.json();
+
+        if (dados.total_count === 0) {
+          mensagemDiv.textContent = "Não foram encontrados usuários para esta pesquisa.";
+          return;
+        }
+
+        dados.items.forEach(usuario => {
+          const div = document.createElement('div');
+          div.className = 'usuario';
+
+          const avatar = document.createElement('img');
+          avatar.src = usuario.avatar_url;
+
+          const link = document.createElement('a');
+          link.href = usuario.html_url;
+          link.target = "_blank";
+          link.textContent = usuario.login;
+
+          div.appendChild(avatar);
+          div.appendChild(link);
+          resultadosDiv.appendChild(div);
+        });
+
+      } catch (erro) {
+        mensagemDiv.textContent = "Erro ao buscar usuários.";
+        console.error(erro);
+      }
+    }
+  </script>
+
+</body>
+</html>

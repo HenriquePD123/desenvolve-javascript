@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<head>
+  <title>Mini Rede Social</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding-top: 160px;
+      background: #f5f5f5;
+    }
+    header {
+      position: fixed;
+      top: 0;
+      width: 100%;
+      background: white;
+      padding: 20px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      z-index: 1000;
+    }
+    textarea {
+      width: 100%;
+      height: 60px;
+      font-size: 1em;
+      padding: 10px;
+    }
+    button {
+      margin-top: 10px;
+      padding: 10px 20px;
+      font-size: 1em;
+    }
+    .feed {
+      max-width: 600px;
+      margin: auto;
+      padding: 10px;
+    }
+    .post {
+      background: white;
+      padding: 15px;
+      margin-bottom: 20px;
+      border-radius: 5px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .post-header {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    .post-header img {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      margin-right: 10px;
+    }
+    .post-text {
+      margin-bottom: 10px;
+    }
+    .post img.cat-img {
+      width: 100%;
+      border-radius: 5px;
+      margin-top: 10px;
+    }
+    .like-button {
+      background-color: #ff4081;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 3px;
+      cursor: pointer;
+    }
+    .like-button:hover {
+      background-color: #e91e63;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <h2>Nova Postagem</h2>
+    <textarea id="textoPost" placeholder="No que você está pensando?"></textarea>
+    <button onclick="criarPost()">Postar</button>
+  </header>
+
+  <div class="feed" id="feed"></div>
+
+  <script>
+    const usuarioAtual = {
+      nome: "usuario123",
+      avatar: "https://i.pravatar.cc/100?img=12"
+    };
+
+    let posts = [];
+
+    async function criarPost() {
+      const texto = document.getElementById("textoPost").value.trim();
+      if (texto === "") return;
+
+      const imagemGato = await fetch("https://api.thecatapi.com/v1/images/search")
+        .then(res => res.json())
+        .then(data => data[0].url)
+        .catch(() => "");
+
+      const novoPost = {
+        data: new Date().toLocaleString(),
+        usuario: usuarioAtual.nome,
+        avatar: usuarioAtual.avatar,
+        texto: texto,
+        imagem: imagemGato,
+        likes: 0
+      };
+
+      posts.unshift(novoPost);
+      document.getElementById("textoPost").value = "";
+      renderizarFeed();
+    }
+
+    function curtirPost(index) {
+      posts[index].likes++;
+      renderizarFeed();
+    }
+
+    function renderizarFeed() {
+      const feed = document.getElementById("feed");
+      feed.innerHTML = "";
+
+      posts.forEach((post, index) => {
+        const postHTML = `
+          <div class="post">
+            <div class="post-header">
+              <img src="${post.avatar}" alt="Avatar">
+              <strong>@${post.usuario}</strong>
+            </div>
+            <div class="post-text">${post.texto}</div>
+            <div><small>${post.data}</small></div>
+            ${post.imagem ? `<img class="cat-img" src="${post.imagem}" alt="Gatinho fofo">` : ""}
+            <div style="margin-top: 10px;">
+              <button class="like-button" onclick="curtirPost(${index})">Curtir (${post.likes})</button>
+            </div>
+          </div>
+        `;
+        feed.innerHTML += postHTML;
+      });
+    }
+  </script>
+
+</body>
+</html>

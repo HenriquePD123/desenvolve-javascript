@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<head>
+    <title>Sistema de Curtidas com localStorage</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+        }
+        input, button {
+            font-size: 1em;
+            padding: 5px;
+            margin-right: 10px;
+        }
+        #likes {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Quem curtiu?</h1>
+
+    <input type="text" id="nome" placeholder="Digite seu nome">
+    <button onclick="curtir()">Curtir</button>
+    <button onclick="limpar()">Limpar</button>
+
+    <p id="likes">Ninguém curtiu</p>
+
+    <script>
+        let curtidas = [];
+
+        window.onload = function () {
+            const armazenado = localStorage.getItem('curtidas');
+            if (armazenado) {
+                curtidas = JSON.parse(armazenado);
+            }
+            atualizarTextoCurtidas();
+        }
+
+        function curtir() {
+            const input = document.getElementById('nome');
+            const nome = input.value.trim();
+
+            if (nome === "") return;
+
+            if (!curtidas.includes(nome)) {
+                curtidas.push(nome);
+                localStorage.setItem('curtidas', JSON.stringify(curtidas));
+            }
+
+            atualizarTextoCurtidas();
+            input.value = "";
+        }
+
+        function limpar() {
+            curtidas = [];
+            localStorage.removeItem('curtidas');
+            atualizarTextoCurtidas();
+        }
+
+        function atualizarTextoCurtidas() {
+            const p = document.getElementById('likes');
+            const total = curtidas.length;
+
+            if (total === 0) {
+                p.textContent = "Ninguém curtiu";
+            } else if (total === 1) {
+                p.textContent = `${curtidas[0]} curtiu`;
+            } else if (total === 2) {
+                p.textContent = `${curtidas[0]} e ${curtidas[1]} curtiram`;
+            } else {
+                p.textContent = `${curtidas[0]}, ${curtidas[1]} e mais ${total - 2} pessoas curtiram`;
+            }
+        }
+    </script>
+
+</body>
+</html>
