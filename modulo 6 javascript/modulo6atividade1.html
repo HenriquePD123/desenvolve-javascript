@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<head>
+  <title>Manipulação com Seletores</title>
+  <style>
+    .destaque {
+      background-color: yellow;
+      font-weight: bold;
+    }
+    li {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1 id="titulo">Título Original</h1>
+
+  <ul id="lista">
+    <li>Arroz</li>
+    <li>Feijão</li>
+    <li>Carne</li>
+  </ul>
+
+  <p>Você está lendo o primeiro parágrafo.</p>
+  <p>You are reading the second paragraph.</p>
+  <p>Estás leyendo el tercer párrafo.</p>
+
+  <button id="botao">Clique aqui para modificar</button>
+
+  <script>
+    function modificarPagina() {
+      const titulo = document.querySelector('#titulo');
+      titulo.textContent = 'Novo Título Usando JavaScript';
+
+      const itensLista = document.querySelectorAll('#lista li');
+      itensLista.forEach(item => {
+        item.style.color = 'blue';
+        item.style.fontSize = '18px';
+      });
+
+      const paragrafos = document.querySelectorAll('p');
+      paragrafos.forEach(p => {
+        p.classList.add('destaque');
+      });
+
+      const botao = document.querySelector('#botao');
+      botao.textContent = 'Alterações feitas!';
+    }
+
+    document.querySelector('#botao').addEventListener('click', modificarPagina);
+  </script>
+
+</body>
+</html>
